@@ -31,6 +31,9 @@ def request_login():
         if login_attempt.message == "file_editing":
             error_text = "There was an error editing the key file on disk"
 
+        if login_attempt.message == "non_key":
+            error_text = "The key you entered wasn't a key..."
+
         #Finally, add error
         core.add_text(
             "login_error_text", 
@@ -54,7 +57,26 @@ def login_succeeded():
 
 #Setup the login page
 def create_login():
-    with simple.window("login_window"):
+    #get main window size
+    window_size = core.get_main_window_size()
+
+    #Setup login window size
+    login_width  = 300
+    login_height = 100
+
+    login_x = int((window_size[0] / 2) - (login_width  / 2))
+    login_y = int((window_size[1] / 2) - (login_height / 2))
+
+    #Build window size
+    with simple.window(
+        "login_window", 
+        no_title_bar = True,
+        no_close = True,
+        no_resize=True,
+        autosize=True,
+        x_pos = login_x,
+        y_pos = login_y
+    ):
         core.add_text("LOGIN")
 
         core.add_input_text("login_input", hint="auth key", password=True, label="")

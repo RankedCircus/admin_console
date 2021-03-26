@@ -55,6 +55,10 @@ class Client:
 
 
     def save_auth_token(self, token):
+        #Before we do anything, and anything else, check if it's a string lmao
+        if len(token) == 0:
+            return return_failure("non_key")
+
         #Before we do anything, we should probably validate the token lmao
         try:
             #Check to see if the folder exists
