@@ -5,8 +5,6 @@ import console_client
 from dearpygui import core, simple
 
 
-
-
 def create_app():
     with simple.window("main_window"):
         core.add_text("Soemthing idk")

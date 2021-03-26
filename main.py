@@ -1,12 +1,10 @@
 #Imports
 import console_client
+
 from gui_client import start_up
+from dearpygui  import core
 
-from dearpygui     import core, simple
-
-
-
-#Setup server client
+#Setup server client | Bring these to env vars later
 HOST = "127.0.0.1"
 PORT = 3000
 

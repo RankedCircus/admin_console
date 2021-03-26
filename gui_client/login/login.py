@@ -1,5 +1,5 @@
 #Import the client for access
-from console_client import setup_client as client
+import console_client
 
 #Import this app
 from gui_client import main_app
@@ -8,8 +8,16 @@ from gui_client import main_app
 from dearpygui import core, simple
 
 #Setup login call back
-def finish_login():
-    #Stop the gui, create the main app
+def request_login():
+    #Simulate a request check
+    console_client.client.test()
+
+    #Now finish 
+    login_succeeded()
+
+
+def login_succeeded():
+    #Remove login, and add main window
     core.delete_item("login_window")
 
     #Create the app
@@ -21,12 +29,7 @@ def create_login():
     with simple.window("login_window"):
         core.add_text("LOGIN")
 
-        def login_test():
-            #Simulate call back
-            client.client.test()
+        core.add_input_text("login_input", hint="auth key", password=True, label="")
 
-            #Now proceed
-            finish_login()
-
-        core.add_button("login_button", callback=login_test)
+        core.add_button("login_button", callback=request_login)
 

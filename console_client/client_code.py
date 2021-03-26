@@ -20,6 +20,11 @@ class Client:
         #Bind
         self.socket_client.connect((self.host, self.port))
         
+        #TODO: Shit here? yeah idk until I get the server code
+
+
+
+
 
     #---------------- Misc Shit ----------------------
     def test(self):
