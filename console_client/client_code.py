@@ -27,6 +27,15 @@ class Client:
 
 
 
+
+
+
+
+    def send_command(self, command_name, args = []):
+        print()
+
+
+
     #---------------- Misc Shit ----------------------
     def test(self):
         print("test")
@@ -86,6 +95,14 @@ class Client:
         return return_success()
 
 
+    def signout(self):
+        #Setup token path
+        token_file_path = "{}/.token_file".format(self.token_path)
+
+        #Remove file
+        os.remove(token_file_path)
+
+        self.auth_token = None
 
 
 
