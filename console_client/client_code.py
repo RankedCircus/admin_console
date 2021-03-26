@@ -1,6 +1,9 @@
 import os
 import socket
 
+import traceback
+from collections import namedtuple
+
 
 class Client:
     def __init__(self, host, port):
@@ -21,8 +24,6 @@ class Client:
         self.socket_client.connect((self.host, self.port))
         
         #TODO: Shit here? yeah idk until I get the server code
-
-
 
 
 
@@ -54,20 +55,46 @@ class Client:
 
 
     def save_auth_token(self, token):
+        #Before we do anything, and anything else, check if it's a string lmao
+        if len(token) == 0:
+            return return_failure("non_key")
+
         #Before we do anything, we should probably validate the token lmao
+        try:
+            #Check to see if the folder exists
+            if os.path.exists(self.token_path) == False:
+                #Make it 
+                os.mkdir(self.token_path)
 
-        #Check to see if the folder exists
-        if os.path.exists(self.token_path) == False:
-            #Make it 
-            os.mkdir(self.token_path)
+            #Check to see if the auth file exist
+            token_file_path = "{}/.token_file".format(self.token_path)
 
-        #Check to see if the auth file exist
-        token_file_path = "{}/.token_file".format(self.token_path)
+            #Create the file, and save it
+            token_file = open(token_file_path, "w+")
+            token_file.write(token)
+            token_file.close()
 
-        #Create the file, and save it
-        token_file = open(token_file_path, "r")
-        token_file.write(token)
-        token_file.close()
+            #Finally save the new token to our system
+            self.auth_token = token
 
-        #Finally save the new token to our system
-        self.auth_token = token
+        except: 
+            print("Error in saving auth token")
+            print(traceback.format_exc())
+            return return_failure("file_editing")
+
+
+        return return_success()
+
+
+
+
+
+#-------------- Return Values ------------------
+result = namedtuple("result", "success data message")
+
+def return_success(data=None):
+    return result(True, data, None)
+
+def return_failure(message):
+    return result(False, None, message)
+
