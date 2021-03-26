@@ -1,0 +1,10 @@
+{
+    "name": "im-just-using-this-for-nodemon",
+    "version": "0.0.1",
+    "scripts": {
+      "watch": "nodemon --watch *.py --ignore '**/__pycache__/**' --exec py main.py"
+     }
+
+}
+    
+

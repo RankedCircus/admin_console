@@ -1,5 +1,2 @@
-from console_client import Client
+client = None
 
-def init(host, port):
-    global client 
-    client = Client(host, port)
