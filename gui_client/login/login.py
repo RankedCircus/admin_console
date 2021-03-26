@@ -21,15 +21,25 @@ def request_login():
 
     #If login key failed, say something
     else:
+        #Delete the current error text if it exists
         if core.does_item_exist("login_error_text"):
             core.delete_item("login_error_text")
 
+        #Setup error text
+        error_text = "There was an error checking your key!"
+
+        if login_attempt.message == "file_editing":
+            error_text = "There was an error editing the key file on disk"
+
+        #Finally, add error
         core.add_text(
             "login_error_text", 
-            default_value="There was an error checking your key", 
+            default_value=error_text, 
             before="login_button",
             wrap=0
         )
+
+        
 
 
 

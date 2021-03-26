@@ -76,7 +76,7 @@ class Client:
         except: 
             print("Error in saving auth token")
             print(traceback.format_exc())
-            return return_failure("")
+            return return_failure("file_editing")
 
 
         return return_success()
