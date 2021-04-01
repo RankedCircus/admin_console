@@ -21,11 +21,7 @@ def add_chat(text):
         while len(text) > TEXT_LENGTH:
             #Get the first 40 chars
             text_to_remove = text[:TEXT_LENGTH]
-
-            #Pop out those chars
-            for char_indx in range(0, TEXT_LENGTH):
-                text.pop(0)
-
+            text = text[TEXT_LENGTH:]
 
             #Add the text to the list
             text_arr.append("...{}...".format(text_to_remove))
