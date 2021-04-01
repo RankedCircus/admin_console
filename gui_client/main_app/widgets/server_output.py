@@ -17,24 +17,22 @@ def add_chat(text):
         current_added = 0
         current_text  = ""
 
-        row = 0
-        for chars in text:
-            current_text += chars
-            current_added += 1
 
-            if current_added >= TEXT_LENGTH:
-                current_added = 0
-                
-                if row == 0:
-                    text_arr.append("{}...".format(current_text))
+        while len(text) > TEXT_LENGTH:
+            #Get the first 40 chars
+            text_to_remove = text[:TEXT_LENGTH]
 
-                else:
-                    text_arr.append("...{}...".format(current_text))
+            #Pop out those chars
+            for char_indx in range(0, TEXT_LENGTH):
+                text.pop(0)
 
-                
-                current_text = ""
-                row += 1
 
+            #Add the text to the list
+            text_arr.append("...{}...".format(text_to_remove))
+
+
+        #Add the final text
+        text_arr.append("...{}".format(text))
     
     else:
         text_arr = [text]
