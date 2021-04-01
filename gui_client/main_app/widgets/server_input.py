@@ -12,7 +12,7 @@ def enter_button():
     text = core.get_value("input_text_value")
 
     #Send it over
-    add_chat(text)
+    add_chat("DEFAULT_USER", text)
 
     #Clear text
     core.set_value("input_text_value", "")
