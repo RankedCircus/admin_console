@@ -52,4 +52,5 @@ def create_app():
 
     #Set the main_window to be primary
     core.set_primary_window("main_window", True)
+    core.set_main_window_title("Circus Referee Console")
     

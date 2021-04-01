@@ -7,17 +7,15 @@ from datetime import datetime
 from dearpygui  import core, simple
 
 
-
+"""
 def add_chat(text):
     #Split the text into multiple entries if it's over X length
     TEXT_LENGTH = 30
 
     text_arr = []
     if len(text) > TEXT_LENGTH:
-        current_added = 0
-        current_text  = ""
 
-
+        #While we're over the text length, add it
         while len(text) > TEXT_LENGTH:
             #Get the first 40 chars
             text_to_remove = text[:TEXT_LENGTH]
@@ -34,18 +32,30 @@ def add_chat(text):
         text_arr = [text]
 
 
-
-    #Remove the last text block's elipse
-    if len(text_arr) > 1:
-        last_item = text_arr[len(text_arr) - 1]
-        text_arr[len(text_arr) - 1] = last_item[0: len(last_item) - 3]
-
     #Add item
     for items in text_arr:
         core.add_row("server_output_entries", [datetime.now(), "SERVER", items])
+"""
+
+def add_chat(user, text):
+    #get current text
+    current_text = core.get_value("server_output_entries")
+    core.delete_item("server_output_entries")
+
+    #If none, add text
+    if current_text == "server_output_entries":
+        current_text = ""
+
+
+    #append new text
+    current_text += "\n[{}][{}]: {}".format(datetime.now(), user, text)
+
+    #Save
+    core.add_text("server_output_entries", default_value=current_text, parent="server_output")
 
 
 
+    
 def create_server_output(dimensions):
     with simple.window(
         "server_output",
@@ -62,9 +72,11 @@ def create_server_output(dimensions):
         #no_background = True
     ):
         #Header
-        core.add_text("Server Output")
+        core.add_text("server_output_entries", default_value="")
 
         #Table | We really should make a custom widget so we can handle LONG entries
+        add_chat("SERVER", "Client init...")
+        """
         core.add_table(
             "server_output_entries",
             headers = ["time", "user", "text"],
@@ -74,5 +86,7 @@ def create_server_output(dimensions):
 
         )
 
+
         #Add a small row
         core.add_row("server_output_entries", [datetime.now(), "SERVER", "Client init..."])
+        """
