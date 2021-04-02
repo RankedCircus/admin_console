@@ -1,5 +1,7 @@
 import os
 import socket
+import time
+import dearpygui.core
 
 import traceback
 from collections import namedtuple
@@ -15,14 +17,43 @@ class Client:
         self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         #Setup auth token
+        self.connected        = False
+        self.connection_error = False
+        self.connection_status = ""
+
         self.token_path = "./CircusAdmin" #Eventually lets pass this to an env? I know he wants to do %local%/path eventually
         self.auth_token = self.fetch_token()
     
     #---------------- Socket Client Commands ----------------------
     def connect(self):
         #Bind
-        self.socket_client.connect((self.host, self.port))
+        while self.connected == False:
+            try:
+                self.socket_client.connect((self.host, self.port))
+                self.connected = True
+
+
+            except:
+                self.connection_error = True
+                self.connection_status = "No Server Found"
+
+
+            #This works??
+            dearpygui.core.set_value("server_status_value", "Not Connected\n(FAILED TO MAKE CONNECTION)")
+
+
+            print("Not Connected")
+
+
+            #Sleep assuming we didn't do anything
+            time.sleep(5)
+
+
+        #Assuming connection succeeded
+        print("Connected")
+        dearpygui.core.set_value("server_status_value", "Connected")
         
+
         #TODO: Shit here? yeah idk until I get the server code
 
 
