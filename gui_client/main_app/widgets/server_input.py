@@ -11,6 +11,13 @@ def enter_button():
     #Get text
     text = core.get_value("input_text_value")
 
+    #Send it lmao
+    success, message = console_client.client.send_command(text)
+
+    if success != True:
+        add_chat("ERROR", "Couldn't send: {}, said: \n {} \n".format(text, message))
+
+
     #Send it over
     add_chat("YOU", text)
 

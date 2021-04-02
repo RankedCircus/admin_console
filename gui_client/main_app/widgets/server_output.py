@@ -17,7 +17,7 @@ def add_chat(user, text):
 
     #Save
     text_id = "server_output_entries_text{}".format(last_chat_id)
-    core.add_text(text_id, default_value=current_text, parent="server_output")
+    core.add_text(text_id, default_value=current_text, parent="server_output", wrap=0)
 
     #Give it colour
     if(user == "SERVER"):
@@ -40,11 +40,11 @@ def create_server_output(dimensions):
         no_resize= True,
         no_move = True,
         menubar = False,
-        no_title_bar = False,
+        no_title_bar = True,
         #no_background = True
     ):
         #Header
-        core.add_text("server_output_entries", default_value="")
+        #core.add_text("server_output_entries", default_value=" ")
 
         #Table | We really should make a custom widget so we can handle LONG entries
         add_chat("SERVER", "Client init...")

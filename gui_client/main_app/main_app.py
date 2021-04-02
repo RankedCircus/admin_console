@@ -1,6 +1,7 @@
 #Import the client for access
 import console_client
 
+from ..login import server_status
 from .widgets import menu, server_input, server_output
 
 #Use GUI
@@ -49,6 +50,9 @@ def create_app():
 
     #Add server output
     server_output.create_server_output(output_dimensions)
+
+    #Create server connection 
+    server_status.create_status(int(0.8 * app_dimensions.width), 20)
 
     #Set the main_window to be primary
     core.set_primary_window("main_window", True)
