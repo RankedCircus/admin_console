@@ -17,6 +17,7 @@ def signout():
     core.delete_item("main_window")
     core.delete_item("server_output")
     core.delete_item("server_input")
+    core.delete_item("status_window")
 
     #Go to login
     login.create_login()
