@@ -1,8 +1,13 @@
 import os
 import socket
-
+import time
+import dearpygui.core
+import threading
 import traceback
-from collections import namedtuple
+
+from datetime            import datetime
+from collections         import namedtuple
+from gui_client.main_app import add_chat
 
 
 class Client:
@@ -15,14 +20,53 @@ class Client:
         self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         #Setup auth token
+        self.connected        = False
+        self.connection_error = False
+        self.connection_status = ""
+
         self.token_path = "./CircusAdmin" #Eventually lets pass this to an env? I know he wants to do %local%/path eventually
         self.auth_token = self.fetch_token()
     
     #---------------- Socket Client Commands ----------------------
     def connect(self):
         #Bind
-        self.socket_client.connect((self.host, self.port))
+        connection_attempts = 0
+        while self.connected == False:
+            try:
+                self.socket_client.connect((self.host, self.port))
+                self.connected = True
+
+
+            except:
+                connection_attempts += 1
+
+                self.connection_error  = True
+                self.connection_status = "No Server Found | {}:{}".format(self.host, self.port)
+
+
+            #This works??
+            dearpygui.core.set_value("server_status_value", "Not Connected\n(FAILED TO MAKE CONNECTION)")
+
+
+            #If the client is opened, then just say that we're still waiting for a connection
+            if dearpygui.core.does_item_exist("server_output_entries_text0"):
+                add_chat("SERVER", "Still not connected... Try {}, last check said: {}".format(connection_attempts, self.connection_status))
+
+
+            #Sleep assuming we didn't do anything
+            time.sleep(5)
+
+
+        #Assuming connection succeeded
+        dearpygui.core.set_value("server_status_value", "Connected")
         
+        add_chat("SERVER", "Connected to {}:{}".format(self.host, self.port))
+
+
+        #Assuming we here, start a thread for getting data
+        message_thread = threading.Thread(target = self.read_message)
+        message_thread.start()
+
         #TODO: Shit here? yeah idk until I get the server code
 
 
@@ -30,15 +74,52 @@ class Client:
 
 
 
+    #Just send data to the socket
+    def send_command(self, string):
+        try:
+            self.socket_client.send((string + "\r\n").encode())
+            return (True, None)
 
-    def send_command(self, command_name, args = []):
-        print()
+
+        #Error handling | This should really be in more depth to handle disconnects, etc
+        except Exception as Error: 
+            #If we were never connected
+            if self.connected == True:
+                return (False, "Not connected to any server D:, log out and back in")
+
+            #If we are connected
+            else:
+                self.connection_error = True
+                return (False, Error)
 
 
 
-    #---------------- Misc Shit ----------------------
-    def test(self):
-        print("test")
+
+    def read_message(self):
+        #While true take any incoming data, and pass it off to add chat
+        try:
+            while(True):
+                Data = self.socket_client.recv(1024).decode()
+
+                #if data send
+                add_chat("SERVER", Data)
+                
+        except ConnectionResetError:
+            #Reset connection handler
+            self.connected = False
+            self.socket_client.close() #Close socket or we can't reconnect
+            self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #Reset the socket
+
+            #Say we disconnected
+            add_chat("SERVER", "Got disconnected, retrying connection now")
+
+            #Restart 
+            network_thread = threading.Thread(target = self.connect)
+            network_thread.start()
+
+
+        #TODO: Handle other errors tat show up
+
 
 
     #-------------- Auth File ------------------

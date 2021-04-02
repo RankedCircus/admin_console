@@ -7,6 +7,8 @@ from gui_client import main_app
 #Use GUI
 from dearpygui import core, simple
 
+from .server_status import create_status
+
 #Setup login call back
 def request_login():
     #Get info from login input
@@ -50,6 +52,7 @@ def request_login():
 def login_succeeded():
     #Remove login, and add main window
     core.delete_item("login_window")
+    core.delete_item("status_window")
 
     #Create the app
     main_app.create_app()
@@ -60,12 +63,24 @@ def create_login():
     #get main window size
     window_size = core.get_main_window_size()
 
-    #Setup login window size
+    #Setup server status window size
+    status_width  = 250
+    status_height = 150
+
+    #Setup login status
     login_width  = 300
     login_height = 100
 
-    login_x = int((window_size[0] / 2) - (login_width  / 2))
-    login_y = int((window_size[1] / 2) - (login_height / 2))
+    #Setup Positions for login
+    login_x = int((window_size[0] / 2) - ( (login_width  / 2) + (status_width / 2) ))
+    login_y = int((window_size[1] / 2) - ( (login_height  / 2) + (status_height / 4) ))
+
+    #Setup positions for status
+    status_x = int((window_size[0] / 2) - ( (login_width  / 2) - (status_width / 2) ))
+    status_y = int((window_size[1] / 2) - ( (login_height  / 2) + (status_height / 2) ))
+
+    #Setup Status 
+    create_status(status_x, status_y)
 
     #Build window size
     with simple.window(
