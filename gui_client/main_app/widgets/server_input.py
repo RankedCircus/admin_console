@@ -11,6 +11,13 @@ def enter_button():
     #Get text
     text = core.get_value("input_text_value")
 
+    #Fail out if we're not connected
+    if console_client.client.connected != True:
+        #Add error | Maybe we don't say shit here?
+        add_chat("ERROR", "Can't send messages if not connected")
+
+        return
+
     #Send it lmao
     success, message = console_client.client.send_command(text)
 

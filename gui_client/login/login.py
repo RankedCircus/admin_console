@@ -14,6 +14,11 @@ def request_login():
     #Get info from login input
     login_key = core.get_value("login_input")
 
+    #Don't login if not connected
+    if console_client.client.connected != True:
+        create_error_text("You can't login if you're not connected to a server")
+        return
+
     #Check login key
     login_attempt = console_client.client.save_auth_token(login_key)
 
@@ -37,16 +42,22 @@ def request_login():
             error_text = "The key you entered wasn't a key..."
 
         #Finally, add error
-        core.add_text(
-            "login_error_text", 
-            default_value=error_text, 
-            before="login_button",
-            wrap=0
-        )
+        create_error_text(error_text)
 
         
 
+def create_error_text(error):
+    #Delete the current error text if it exists
+    if core.does_item_exist("login_error_text"):
+        core.delete_item("login_error_text")
 
+    core.add_text(
+        "login_error_text", 
+        
+        default_value = error, 
+        before        = "login_button",
+        wrap          = 0
+    ) 
 
 
 def login_succeeded():
@@ -82,6 +93,7 @@ def create_login():
     #Setup Status 
     create_status(status_x, status_y)
 
+
     #Build window size
     with simple.window(
         "login_window", 
@@ -94,7 +106,7 @@ def create_login():
     ):
         core.add_text("LOGIN")
 
-        core.add_input_text("login_input", hint="auth key", password=True, label="")
+        core.add_input_text("login_input", hint="auth key", on_enter=True, password=True, label="")
         core.add_text("login_error_text", default_value=" ", before="login_button")
 
 
