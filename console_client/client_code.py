@@ -52,6 +52,7 @@ class Client:
 
         #Try and connect while we aren't connected
         while self.connected == False:
+
             #If there's a disconnect request, exit
             if(self.disconnect_request == True):
                 #Leave
