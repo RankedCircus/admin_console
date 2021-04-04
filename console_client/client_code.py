@@ -12,31 +12,58 @@ from gui_client.main_app import add_chat
 
 class Client:
     def __init__(self, host, port):
+        #Setup host info 
+        self.host_list = [
+            "johnbender.rankedcircus.com",
+            "andrewclark.rankedcircus.com",
+            "allisonreynolds.rankedcircus.com",
+            "brianjohnson.rankedcircus.com",
+            "127.0.0.1"
+        ]
+
         #Save port info
         self.host = host
         self.port = port
 
+        #If host is none, set it to self.host[0]
+        if self.host == None:
+            self.host = self.host_list[0]
+
         #Setup client
         self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        #Setup auth token
-        self.connected        = False
-        self.connection_error = False
-        self.connection_status = ""
-
+        #Setup Connection info
+        self.disconnect_request = False
+        self.connected          = False
+        self.connection_error   = False
+        self.connection_status  = ""
+        
+        #Token Info
         self.token_path = "./CircusAdmin" #Eventually lets pass this to an env? I know he wants to do %local%/path eventually
         self.auth_token = self.fetch_token()
     
     #---------------- Socket Client Commands ----------------------
     def connect(self):
-        #Bind
+        #Setup attempt counter
         connection_attempts = 0
+ 
+        #Reset disconnect request 
+        self.disconnect_request = False
+
+        #Try and connect while we aren't connected
         while self.connected == False:
+            #If there's a disconnect request, exit
+            if(self.disconnect_request == True):
+                #Leave
+                return  
+
+            #Attempt connection
             try:
                 self.socket_client.connect((self.host, self.port))
                 self.connected = True
+                break
 
-
+            #Connection Failure handler
             except:
                 connection_attempts += 1
 
@@ -44,24 +71,22 @@ class Client:
                 self.connection_status = "No Server Found | {}:{}".format(self.host, self.port)
 
 
-            #This works??
-            dearpygui.core.set_value("server_status_value", "Not Connected\n(FAILED TO MAKE CONNECTION)")
+                #Update what's the status of the server
+                dearpygui.core.set_value("server_status_value", "Not Connected\n(FAILED TO MAKE CONNECTION)")
 
 
-            #If the client is opened, then just say that we're still waiting for a connection
-            if dearpygui.core.does_item_exist("server_output_entries_text0"):
-                add_chat("SERVER", "Still not connected... Try {}, last check said: {}".format(connection_attempts, self.connection_status))
+                #If the client is opened, then just say that we're still waiting for a connection
+                if dearpygui.core.does_item_exist("server_output_entries_text0"):
+                    add_chat("SERVER", "Still not connected... Try {}, last check said: {}".format(connection_attempts, self.connection_status))
 
 
-            #Sleep assuming we didn't do anything
-            time.sleep(5)
+                #Sleep assuming we didn't do anything
+                time.sleep(5)
 
-
-        #Assuming connection succeeded
-        dearpygui.core.set_value("server_status_value", "Connected")
         
+        #Say we connected
+        dearpygui.core.set_value("server_status_value", "Connected")
         add_chat("SERVER", "Connected to {}:{}".format(self.host, self.port))
-
 
         #Assuming we here, start a thread for getting data
         message_thread = threading.Thread(target = self.read_message)
@@ -69,9 +94,17 @@ class Client:
 
         #TODO: Shit here? yeah idk until I get the server code
 
+    def disconnect(self):
+        #If connected, don't be
+        if self.connected:
+            self.socket_client.close() #Close socket or we can't reconnect
+        
+        #Reset the sock
+        self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #Reset the socket
 
-
-
+        #Reset internal values
+        self.connected          = False
+        self.disconnect_request = True
 
 
     #Just send data to the socket
@@ -93,12 +126,10 @@ class Client:
                 return (False, Error)
 
 
-
-
     def read_message(self):
         #While true take any incoming data, and pass it off to add chat
         try:
-            while(True):
+            while(self.disconnect_request != True):
                 Data = self.socket_client.recv(1024).decode()
 
                 #if data send
@@ -116,6 +147,15 @@ class Client:
             #Restart 
             network_thread = threading.Thread(target = self.connect)
             network_thread.start()
+
+        except ConnectionAbortedError:
+            #Reset connection handler
+            self.connected = False
+            self.socket_client.close() #Close socket or we can't reconnect
+            self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #Reset the socket
+
+            #Say we disconnected
+            add_chat("SERVER", "User disconnected")
 
 
         #TODO: Handle other errors tat show up
@@ -142,7 +182,6 @@ class Client:
         #Decode token? idk what exactly his plan is, so for now if there's content in this file
         #Return it
         return encoded_token
-
 
     def save_auth_token(self, token):
         #Before we do anything, and anything else, check if it's a string lmao
@@ -174,7 +213,6 @@ class Client:
 
 
         return return_success()
-
 
     def signout(self):
         #Setup token path

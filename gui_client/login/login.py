@@ -82,6 +82,7 @@ def create_login():
     #Setup Status 
     create_status(status_x, status_y)
 
+
     #Build window size
     with simple.window(
         "login_window", 
